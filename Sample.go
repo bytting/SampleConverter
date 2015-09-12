@@ -1,12 +1,15 @@
 package main
 
-import "encoding/xml"
+import (
+        "encoding/xml"
+        "time"
+)
 
 // Structure representing a sample
 type Sample struct {
 
         XMLName   xml.Name `xml:"sample" json:"-"`
-        Date      string `xml:"date" json:"date"`
+        Date      time.Time `xml:"date" json:"date"`
 	Latitude  float64 `xml:"latitude" json:"latitude"`
 	Longitude float64 `xml:"longitude" json:"longitude"`
 	Value     float64 `xml:"value" json:"value"`

@@ -6,6 +6,7 @@ import (
 	"github.com/robertkrimen/otto"
 	"io/ioutil"
 	"os"
+        "time"
 )
 
 // Structure representing a sample reader
@@ -199,7 +200,12 @@ func (sr *SampleReader) getSample() (*Sample, error) {
 		return nil, errors.New("date not defined")
 	}
 
-	s.Date, err = v.ToString()
+        ds, err := v.ToString()
+	if err != nil {
+		return nil, err
+	}
+
+        s.Date, err = time.Parse("2006-01-02T15:04:05", ds)
 	if err != nil {
 		return nil, err
 	}
