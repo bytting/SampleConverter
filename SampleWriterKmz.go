@@ -139,7 +139,7 @@ func (sw *SampleWriterKmz) Write(s *Sample) error {
 	p.Description = "Value: " + strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit +
 		"\nLatitude: " + strconv.FormatFloat(s.Latitude, 'f', -1, 64) +
 		"\nLongitude: " + strconv.FormatFloat(s.Longitude, 'f', -1, 64) +
-		"\nTime: " + s.Date.Format("2006-01-02 15:04:05") + "\nFile: " + filepath.Base(sw.KmzFile)
+		"\nTime: " + s.Date.String() + "\nFile: " + filepath.Base(sw.KmzFile)
 
         // Write placemark structure to the kml file
 	b, err := xml.MarshalIndent(p, "    ", "    ")

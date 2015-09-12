@@ -151,6 +151,7 @@ func (sr *SampleReader) createPluginRuntime() (*otto.Otto, error) {
 // Execute plugin and extract a sample
 func (sr *SampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 
+        // Prepare arguments
 	argLineNum, err := sr.vm.ToValue(lineNum)
 	if err != nil {
 		return nil, err
@@ -161,11 +162,13 @@ func (sr *SampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 		return nil, err
 	}
 
+        // Execute plugin
 	retVal, err := sr.vm.Call("parseLine", nil, argLineNum, argLine)
 	if err != nil {
 		return nil, err
 	}
 
+        // Extract and evaluate return value
 	ret, err := retVal.ToBoolean()
 	if err != nil {
 		return nil, err
@@ -175,6 +178,7 @@ func (sr *SampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 		return nil, nil
 	}
 
+        // Extract a full sample from javascript runtime
 	sample, err := sr.getSample()
 	if err != nil {
 		return nil, err
@@ -191,6 +195,7 @@ func (sr *SampleReader) getSample() (*Sample, error) {
 
 	s := new(Sample)
 
+        // Extract date field from javascript runtime
 	v, err = sr.vm.Get("date")
 	if err != nil {
 		return nil, err
@@ -210,6 +215,7 @@ func (sr *SampleReader) getSample() (*Sample, error) {
 		return nil, err
 	}
 
+        // Extract latitude field from javascript runtime
 	v, err = sr.vm.Get("latitude")
 	if err != nil {
 		return nil, err
@@ -224,6 +230,7 @@ func (sr *SampleReader) getSample() (*Sample, error) {
 		return nil, err
 	}
 
+        // Extract longitude field from javascript runtime
 	v, err = sr.vm.Get("longitude")
 	if err != nil {
 		return nil, err
@@ -238,6 +245,7 @@ func (sr *SampleReader) getSample() (*Sample, error) {
 		return nil, err
 	}
 
+        // Extract value field from javascript runtime
 	v, err = sr.vm.Get("value")
 	if err != nil {
 		return nil, err
@@ -252,6 +260,7 @@ func (sr *SampleReader) getSample() (*Sample, error) {
 		return nil, err
 	}
 
+        // Extract unit field from javascript runtime
 	v, err = sr.vm.Get("unit")
 	if err != nil {
 		return nil, err
