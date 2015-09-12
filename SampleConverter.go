@@ -142,7 +142,13 @@ func main() {
 			log.Fatalf("Plugin %s does not exist", pluginFile)
 		}
 
-	        for _, sampleFile := range flag.Args() {
+                var sampleFiles []string
+                for _, pattern := range flag.Args() {
+                        files, _ := filepath.Glob(pattern)
+                        sampleFiles = append(sampleFiles, files...)
+                }
+
+	        for _, sampleFile := range sampleFiles {
 
                         if !FileExists(sampleFile) {
                                 log.Printf("Sampling file %s does not exist", sampleFile)
