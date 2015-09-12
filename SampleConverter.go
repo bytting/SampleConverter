@@ -44,6 +44,8 @@ func main() {
 	flag.BoolVar(&useScientific, "use-scientific", false, "Use scientific notation for decimal values")
 	flag.Parse()
 
+        useFormat = strings.ToLower(useFormat)
+
 	usr, _ := user.Current()
 
 	// Initialize log
@@ -115,8 +117,6 @@ func main() {
 				continue
 			}
 
-			log.Printf("Generating file %s with plugin %s\n", sampFile, pluginFile)
-
 			sr, err := NewSampleReader(pluginFile, sampFile)
 			if err != nil {
 				log.Fatalln(err.Error())
@@ -126,6 +126,8 @@ func main() {
 			if err != nil {
 				log.Fatalln(err.Error())
 			}
+
+			log.Printf("Converting file %s with plugin %s using format \"%s\"\n", sampFile, pluginFile, useFormat)
 
 			for {
 				s, ok, err := sr.Read()
@@ -141,8 +143,6 @@ func main() {
 				if err != nil {
 					log.Fatalln(err.Error())
 				}
-
-				//log.Printf("%s %f %f %f %s\n", s.Date, s.Latitude, s.Longitude, s.Value, s.Unit)
 			}
 			sr.Close()
 			sw.Close()
@@ -159,11 +159,13 @@ func createSampleWriter(sampleFile string, useScientific, useLabels bool, minVal
 
         switch useFormat {
         case "xml":
-                return NewSampleWriterXml(sampleFile + ".xml", useScientific)
+                return NewSampleWriterXml(sampleFile + ".xml")
         case "kmz":
                 return NewSampleWriterKmz(sampleFile + ".kmz", useScientific, useLabels, minValue, maxValue)
         case "json":
-                return NewSampleWriterJson(sampleFile + ".json", useScientific)
+                return NewSampleWriterJson(sampleFile + ".json")
+        case "csv":
+                return NewSampleWriterCsv(sampleFile + ".csv", useScientific)
         }
 
         return nil, errors.New("Output format not supported: " + useFormat)

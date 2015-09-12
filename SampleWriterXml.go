@@ -11,18 +11,16 @@ import (
 type SampleWriterXml struct {
 
 	XmlFile       string
-        UseScientific bool
 	fd            *os.File
 	fw            *bufio.Writer
 }
 
 // Create a new sample writer
-func NewSampleWriterXml(xmlFile string, useScientific bool) (SampleWriter, error) {
+func NewSampleWriterXml(xmlFile string) (SampleWriter, error) {
 
         // Initialize a sample writer
 	sw := new(SampleWriterXml)
 	sw.XmlFile = xmlFile
-        sw.UseScientific = useScientific
 
 	var err error
 	sw.fd, err = os.Create(sw.XmlFile)
@@ -39,12 +37,6 @@ func NewSampleWriterXml(xmlFile string, useScientific bool) (SampleWriter, error
 
 // Write a sample to the xml file
 func (sw *SampleWriterXml) Write(s *Sample) error {
-
-        // Set the number format
-	/*mod := byte('f')
-	if sw.UseScientific {
-		mod = byte('E')
-	}*/
 
         // Write placemark structure to the kml file
 	b, err := xml.MarshalIndent(s, "  ", "    ")

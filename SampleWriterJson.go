@@ -12,19 +12,17 @@ import (
 type SampleWriterJson struct {
 
 	JsonFile      string
-        UseScientific bool
 	fd            *os.File
 	fw            *bufio.Writer
         sep string
 }
 
 // Create a new sample writer
-func NewSampleWriterJson(jsonFile string, useScientific bool) (SampleWriter, error) {
+func NewSampleWriterJson(jsonFile string) (SampleWriter, error) {
 
         // Initialize a sample writer
 	sw := new(SampleWriterJson)
 	sw.JsonFile = jsonFile
-        sw.UseScientific = useScientific
         sw.sep = ""
 
 	var err error
@@ -41,12 +39,6 @@ func NewSampleWriterJson(jsonFile string, useScientific bool) (SampleWriter, err
 
 // Write a sample to the json file
 func (sw *SampleWriterJson) Write(s *Sample) error {
-
-        // Set the number format
-	/*mod := byte('f')
-	if sw.UseScientific {
-		mod = byte('E')
-	}*/
 
 	b, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
