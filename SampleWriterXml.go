@@ -22,7 +22,7 @@ import (
 )
 
 // Structure representing a sample writer
-type SampleWriterXml struct {
+type sampleWriterXml struct {
 
 	XmlFile       string
 	fd            *os.File
@@ -33,7 +33,7 @@ type SampleWriterXml struct {
 func NewSampleWriterXml(xmlFile string) (SampleWriter, error) {
 
         // Initialize a sample writer
-	sw := new(SampleWriterXml)
+	sw := new(sampleWriterXml)
 	sw.XmlFile = xmlFile
 
 	var err error
@@ -50,7 +50,7 @@ func NewSampleWriterXml(xmlFile string) (SampleWriter, error) {
 }
 
 // Write a sample to the xml file
-func (sw *SampleWriterXml) Write(s *Sample) error {
+func (sw *sampleWriterXml) Write(s *Sample) error {
 
         // Write placemark structure to the kml file
 	b, err := xml.MarshalIndent(s, "  ", "    ")
@@ -63,7 +63,7 @@ func (sw *SampleWriterXml) Write(s *Sample) error {
 }
 
 // Finish the xml file
-func (sw *SampleWriterXml) Close() error {
+func (sw *sampleWriterXml) Close() error {
 
 	sw.fw.WriteString("</samples>")
 	sw.fw.Flush()

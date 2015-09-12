@@ -22,7 +22,7 @@ import (
 )
 
 // Structure representing a sample writer
-type SampleWriterCsv struct {
+type sampleWriterCsv struct {
 
 	CsvFile       string
         UseScientific bool
@@ -34,7 +34,7 @@ type SampleWriterCsv struct {
 func NewSampleWriterCsv(csvFile string, useScientific bool) (SampleWriter, error) {
 
         // Initialize a sample writer
-	sw := new(SampleWriterCsv)
+	sw := new(sampleWriterCsv)
 	sw.CsvFile = csvFile
         sw.UseScientific = useScientific
 
@@ -51,7 +51,7 @@ func NewSampleWriterCsv(csvFile string, useScientific bool) (SampleWriter, error
 }
 
 // Write a sample to the csv file
-func (sw *SampleWriterCsv) Write(s *Sample) error {
+func (sw *sampleWriterCsv) Write(s *Sample) error {
 
         // Set the number format
 	mod := byte('f')
@@ -69,7 +69,7 @@ func (sw *SampleWriterCsv) Write(s *Sample) error {
 }
 
 // Finish the csv file
-func (sw *SampleWriterCsv) Close() error {
+func (sw *sampleWriterCsv) Close() error {
 
 	sw.fw.Flush()
 	sw.fd.Close()

@@ -22,7 +22,7 @@ import (
 )
 
 // Structure representing a sample writer
-type SampleWriterJson struct {
+type sampleWriterJson struct {
 
 	JsonFile      string
 	fd            *os.File
@@ -34,7 +34,7 @@ type SampleWriterJson struct {
 func NewSampleWriterJson(jsonFile string) (SampleWriter, error) {
 
         // Initialize a sample writer
-	sw := new(SampleWriterJson)
+	sw := new(sampleWriterJson)
 	sw.JsonFile = jsonFile
         sw.sep = ""
 
@@ -51,7 +51,7 @@ func NewSampleWriterJson(jsonFile string) (SampleWriter, error) {
 }
 
 // Write a sample to the json file
-func (sw *SampleWriterJson) Write(s *Sample) error {
+func (sw *sampleWriterJson) Write(s *Sample) error {
 
 	b, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
@@ -67,7 +67,7 @@ func (sw *SampleWriterJson) Write(s *Sample) error {
 }
 
 // Finish the json file
-func (sw *SampleWriterJson) Close() error {
+func (sw *sampleWriterJson) Close() error {
 
         sw.fw.WriteString("\n]")
 	sw.fw.Flush()

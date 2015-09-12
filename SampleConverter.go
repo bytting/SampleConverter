@@ -29,7 +29,7 @@ import (
 )
 
 var progName string
-var version string = "0.1"
+var version string = "0.2"
 
 // Flag variables
 var (
@@ -86,6 +86,7 @@ func main() {
 	settingsFile := filepath.Join(usr.HomeDir, "makekmz.json")
 
 	if !FileExists(settingsFile) {
+
 		settings = Settings{PluginDirectory: filepath.Join(usr.HomeDir, "makekmz-plugins")}
 		os.MkdirAll(settings.PluginDirectory, 0777)
 
@@ -131,7 +132,7 @@ func main() {
 
 	} else if len(usePlugin) > 0 {
 
-		// Generate kmz files
+		// Convert sample files
 		if flag.NArg() < 1 {
 			log.Fatalln("No input files given")
 		}
@@ -141,53 +142,61 @@ func main() {
 			log.Fatalf("Plugin %s does not exist", pluginFile)
 		}
 
-		for _, sampFile := range flag.Args() {
-			if !FileExists(sampFile) {
-				log.Printf("Sampling file %s does not exist", sampFile)
-				continue
-			}
+	        for _, sampleFile := range flag.Args() {
 
-			sr, err := NewSampleReader(pluginFile, sampFile)
-			if err != nil {
-				log.Fatalln(err.Error())
-			}
+                        if !FileExists(sampleFile) {
+                                log.Printf("Sampling file %s does not exist", sampleFile)
+                                continue
+                        }
 
-                        sw, err := createSampleWriter(sampFile, useScientific, useLabels, sr.MinValue, sr.MaxValue)
-			if err != nil {
-                                sr.Close()
-				log.Fatalln(err.Error())
-			}
+                        err := convertSampleFile(pluginFile, sampleFile)
+                        if err != nil {
+                                log.Fatalln(err.Error())
+                        }
+                }
 
-			log.Printf("Converting file %s with plugin %s using format \"%s\"\n", sampFile, pluginFile, useFormat)
-
-			for {
-				s, ok, err := sr.Read()
-				if err != nil {
-                                        sr.Close()
-                                        sw.Close()
-					log.Fatalln(err.Error())
-				}
-
-				if !ok {
-					break
-				}
-
-				err = sw.Write(s)
-				if err != nil {
-                                        sr.Close()
-                                        sw.Close()
-					log.Fatalln(err.Error())
-				}
-			}
-			sr.Close()
-			sw.Close()
-		}
 		os.Exit(0)
 
 	} else {
                 log.Fatalln("Missing arguments.\nUse \"" + progName + " -h\" for a description of possible arguments")
 		os.Exit(1)
 	}
+}
+
+// Convert a single sample file
+func convertSampleFile(pluginFile, sampleFile string) error {
+
+	sr, err := NewSampleReader(pluginFile, sampleFile)
+	if err != nil {
+                return err
+	}
+	defer sr.Close()
+
+        sw, err := createSampleWriter(sampleFile, useScientific, useLabels, sr.MinValue, sr.MaxValue)
+	if err != nil {
+                return err
+	}
+	defer sw.Close()
+
+	log.Printf("Converting file %s with plugin %s using format \"%s\"\n", sampleFile, pluginFile, useFormat)
+
+	for {
+		s, ok, err := sr.Read()
+		if err != nil {
+                        return err
+		}
+
+		if !ok {
+			break
+		}
+
+		err = sw.Write(s)
+		if err != nil {
+                        return err
+		}
+	}
+
+        return nil
 }
 
 // Create the correct sample writer based on the useFormat flag

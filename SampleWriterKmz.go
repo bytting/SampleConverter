@@ -29,7 +29,7 @@ import (
 )
 
 // Structure representing a sample writer
-type SampleWriterKmz struct {
+type sampleWriterKmz struct {
 
 	KmlFile       string
 	KmzFile       string
@@ -75,7 +75,7 @@ type Placemark struct {
 func NewSampleWriterKmz(kmzFile string, useScientific, useLabels bool, minValue, maxValue float64) (SampleWriter, error) {
 
         // Initialize a sample writer
-	sw := new(SampleWriterKmz)
+	sw := new(sampleWriterKmz)
 	sw.KmzFile = kmzFile
         ext := filepath.Ext(sw.KmzFile)
 	sw.KmlFile = strings.TrimSuffix(sw.KmzFile, ext) + ".kml"
@@ -118,7 +118,7 @@ func NewSampleWriterKmz(kmzFile string, useScientific, useLabels bool, minValue,
 }
 
 // Write a sample to the kml file
-func (sw *SampleWriterKmz) Write(s *Sample) error {
+func (sw *sampleWriterKmz) Write(s *Sample) error {
 
 	var p Placemark
 	var styleId int
@@ -166,7 +166,7 @@ func (sw *SampleWriterKmz) Write(s *Sample) error {
 }
 
 // Finish the kml file and zip it to make a kmz file
-func (sw *SampleWriterKmz) Close() error {
+func (sw *sampleWriterKmz) Close() error {
 
 	sw.fw.WriteString("  </Document>\n</kml>")
 	sw.fw.Flush()
@@ -183,7 +183,7 @@ func (sw *SampleWriterKmz) Close() error {
 }
 
 // Zip the kml file
-func (sw *SampleWriterKmz) zipKml() error {
+func (sw *sampleWriterKmz) zipKml() error {
 
 	// Create kmz file
 	zfout, err := os.Create(sw.KmzFile)
