@@ -1,11 +1,14 @@
 package main
 
+import "encoding/xml"
+
 // Structure representing a sample
 type Sample struct {
 
-	Date      string
-	Latitude  float64
-	Longitude float64
-	Value     float64
-	Unit      string
+        XMLName   xml.Name `xml:"sample" json:"-"`
+        Date      string `xml:"date" json:"date"`
+	Latitude  float64 `xml:"latitude" json:"latitude"`
+	Longitude float64 `xml:"longitude" json:"longitude"`
+	Value     float64 `xml:"value" json:"value"`
+	Unit      string `xml:"unit" json:"unit"`
 }

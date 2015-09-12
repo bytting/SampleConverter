@@ -7,6 +7,7 @@ import (
 	"encoding/xml"
 	"io/ioutil"
 	"os"
+        "strings"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -15,7 +16,6 @@ import (
 // Structure representing a sample writer
 type SampleWriterKmz struct {
 
-	SampleFile    string
 	KmlFile       string
 	KmzFile       string
 	MinValue      float64
@@ -57,13 +57,14 @@ type Placemark struct {
 }
 
 // Create a new sample writer
-func NewSampleWriterKmz(sampleFile string, useScientific, useLabels bool, minValue, maxValue float64) (SampleWriter, error) {
+func NewSampleWriterKmz(kmzFile string, useScientific, useLabels bool, minValue, maxValue float64) (SampleWriter, error) {
 
         // Initialize a sample writer
 	sw := new(SampleWriterKmz)
-	sw.SampleFile = sampleFile
-	sw.KmlFile = sw.SampleFile + ".kml"
-	sw.KmzFile = sw.SampleFile + ".kmz"
+	//sw.SampleFile = sampleFile
+	sw.KmzFile = kmzFile
+        ext := filepath.Ext(sw.KmzFile)
+	sw.KmlFile = strings.TrimSuffix(sw.KmzFile, ext) + ".kml"
 	sw.MinValue = minValue
 	sw.MaxValue = maxValue
 	sw.UseScientific = useScientific
@@ -138,7 +139,7 @@ func (sw *SampleWriterKmz) Write(s *Sample) error {
 	p.Description = "Value: " + strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit +
 		"\nLatitude: " + strconv.FormatFloat(s.Latitude, 'f', -1, 64) +
 		"\nLongitude: " + strconv.FormatFloat(s.Longitude, 'f', -1, 64) +
-		"\nTime: " + s.Date + "\nFile: " + filepath.Base(sw.SampleFile)
+		"\nTime: " + s.Date + "\nFile: " + filepath.Base(sw.KmzFile)
 
         // Write placemark structure to the kml file
 	b, err := xml.MarshalIndent(p, "    ", "    ")

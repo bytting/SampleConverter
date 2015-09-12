@@ -10,11 +10,13 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+        "errors"
 )
 
 // Flag variables
 var (
 	usePlugin           string
+        useFormat           string
 	listPlugins         bool
 	setPluginDirectory  string
 	showPluginDirectory bool
@@ -34,6 +36,7 @@ func main() {
 
 	// Load flags
 	flag.StringVar(&usePlugin, "use-plugin", "", "Convert one or more sample files using the given plugin")
+	flag.StringVar(&useFormat, "use-format", "kmz", "Use the given output format")
 	flag.BoolVar(&listPlugins, "list-plugins", false, "List all available plugins")
         flag.StringVar(&setPluginDirectory, "set-plugin-directory", "", "Set the directory where " + progName + " looks for plugins")
 	flag.BoolVar(&showPluginDirectory, "show-plugin-directory", false, "Show the directory where " + progName + " looks for plugins")
@@ -119,7 +122,7 @@ func main() {
 				log.Fatalln(err.Error())
 			}
 
-			sw, err := NewSampleWriterKmz(sampFile, useScientific, useLabels, sr.MinValue, sr.MaxValue)
+                        sw, err := createSampleWriter(sampFile, useScientific, useLabels, sr.MinValue, sr.MaxValue)
 			if err != nil {
 				log.Fatalln(err.Error())
 			}
@@ -150,4 +153,18 @@ func main() {
 		log.Fatalln("Missing arguments")
 		os.Exit(1)
 	}
+}
+
+func createSampleWriter(sampleFile string, useScientific, useLabels bool, minValue, maxValue float64) (SampleWriter, error) {
+
+        switch useFormat {
+        case "xml":
+                return NewSampleWriterXml(sampleFile + ".xml", useScientific)
+        case "kmz":
+                return NewSampleWriterKmz(sampleFile + ".kmz", useScientific, useLabels, minValue, maxValue)
+        case "json":
+                return NewSampleWriterJson(sampleFile + ".json", useScientific)
+        }
+
+        return nil, errors.New("Output format not supported: " + useFormat)
 }
