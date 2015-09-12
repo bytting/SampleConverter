@@ -1,3 +1,18 @@
+/*
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+// CONTRIBUTORS AND COPYRIGHT HOLDERS (c) 2015:
+// Dag Robøle (dag D0T robole AT gmail D0T com)
+
 package main
 
 import (
@@ -13,6 +28,9 @@ import (
         "errors"
 )
 
+var progName string
+var version string = "0.1"
+
 // Flag variables
 var (
 	usePlugin           string
@@ -20,6 +38,7 @@ var (
 	listPlugins         bool
 	setPluginDirectory  string
 	showPluginDirectory bool
+        showVersion         bool
 	useLabels           bool
 	useScientific       bool
 )
@@ -30,9 +49,10 @@ type Settings struct {
 	PluginDirectory string `json:"PluginDirectory"`
 }
 
-func main() {
+func init() {
 
-        progName := filepath.Base(os.Args[0])
+        // Save program name
+        progName = filepath.Base(os.Args[0])
 
 	// Load flags
 	flag.StringVar(&usePlugin, "use-plugin", "", "Convert one or more sample files using the given plugin")
@@ -40,12 +60,16 @@ func main() {
 	flag.BoolVar(&listPlugins, "list-plugins", false, "List all available plugins")
         flag.StringVar(&setPluginDirectory, "set-plugin-directory", "", "Set the directory where " + progName + " looks for plugins")
 	flag.BoolVar(&showPluginDirectory, "show-plugin-directory", false, "Show the directory where " + progName + " looks for plugins")
+	flag.BoolVar(&showVersion, "version", false, "Show " + progName + " version")
 	flag.BoolVar(&useLabels, "use-labels", false, "Use labels for markers")
 	flag.BoolVar(&useScientific, "use-scientific", false, "Use scientific notation for decimal values")
+}
+
+func main() {
+
 	flag.Parse()
 
         useFormat = strings.ToLower(useFormat)
-
 	usr, _ := user.Current()
 
 	// Initialize log
@@ -89,6 +113,12 @@ func main() {
 		fmt.Println(settings.PluginDirectory)
 		os.Exit(0)
 
+	} else if showVersion {
+
+		// Print version
+                fmt.Println(version)
+                os.Exit(0)
+
 	} else if len(setPluginDirectory) > 0 {
 
 		// Set plugin directory
@@ -124,6 +154,7 @@ func main() {
 
                         sw, err := createSampleWriter(sampFile, useScientific, useLabels, sr.MinValue, sr.MaxValue)
 			if err != nil {
+                                sr.Close()
 				log.Fatalln(err.Error())
 			}
 
@@ -132,6 +163,8 @@ func main() {
 			for {
 				s, ok, err := sr.Read()
 				if err != nil {
+                                        sr.Close()
+                                        sw.Close()
 					log.Fatalln(err.Error())
 				}
 
@@ -141,6 +174,8 @@ func main() {
 
 				err = sw.Write(s)
 				if err != nil {
+                                        sr.Close()
+                                        sw.Close()
 					log.Fatalln(err.Error())
 				}
 			}
@@ -150,11 +185,12 @@ func main() {
 		os.Exit(0)
 
 	} else {
-		log.Fatalln("Missing arguments")
+                log.Fatalln("Missing arguments.\nUse \"" + progName + " -h\" for a description of possible arguments")
 		os.Exit(1)
 	}
 }
 
+// Create the correct sample writer based on the useFormat flag
 func createSampleWriter(sampleFile string, useScientific, useLabels bool, minValue, maxValue float64) (SampleWriter, error) {
 
         switch useFormat {
