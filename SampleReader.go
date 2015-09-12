@@ -8,7 +8,9 @@ import (
 	"os"
 )
 
+// Structure representing a sample reader
 type SampleReader struct {
+
 	PluginFile string
 	SampleFile string
 	MinValue   float64
@@ -19,7 +21,10 @@ type SampleReader struct {
 	vm         *otto.Otto
 }
 
+// Create a new sample reader
 func NewSampleReader(pluginFile, sampleFile string) (*SampleReader, error) {
+
+        // Initialize a sample reader structure
 	sr := new(SampleReader)
 	sr.PluginFile = pluginFile
 	sr.SampleFile = sampleFile
@@ -36,11 +41,14 @@ func NewSampleReader(pluginFile, sampleFile string) (*SampleReader, error) {
 	sr.scanner = bufio.NewScanner(sr.fd)
 	sr.lineNum = 0
 
+        // Create a otto javascript runtime
 	sr.vm, err = sr.createPluginRuntime()
 	if err != nil {
 		return nil, err
 	}
 
+        // Scan the sample file to find the min and max measurement values (God, make it stop)
+        // The kmz sample writer need these values to calculate the correct placemark colors
 	initialized := false
 
 	for sr.scanner.Scan() {
@@ -74,6 +82,7 @@ func NewSampleReader(pluginFile, sampleFile string) (*SampleReader, error) {
 		return nil, err
 	}
 
+        // Reset the scanner for later use
 	sr.fd.Seek(0, 0)
 	sr.scanner = bufio.NewScanner(sr.fd)
 	sr.lineNum = 0
@@ -81,6 +90,7 @@ func NewSampleReader(pluginFile, sampleFile string) (*SampleReader, error) {
 	return sr, nil
 }
 
+// Read the next line from the sample file using a javascript plugin and make a sample structure from it
 func (sr *SampleReader) Read() (*Sample, bool, error) {
 
 	for {
@@ -111,11 +121,14 @@ func (sr *SampleReader) Read() (*Sample, bool, error) {
 	return nil, false, nil
 }
 
+// Close the sample reader and clean up
 func (sr *SampleReader) Close() error {
+
 	sr.fd.Close()
 	return nil
 }
 
+// Create a javascript runtime
 func (sr *SampleReader) createPluginRuntime() (*otto.Otto, error) {
 
 	// Read plugin file

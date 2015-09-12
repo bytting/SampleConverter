@@ -12,7 +12,9 @@ import (
 	"strconv"
 )
 
+// Structure representing a sample writer
 type SampleWriterKmz struct {
+
 	SampleFile    string
 	KmlFile       string
 	KmzFile       string
@@ -24,7 +26,9 @@ type SampleWriterKmz struct {
 	fw            *bufio.Writer
 }
 
+// Structure representing a kml style
 type Style struct {
+
 	Id        string `xml:"id,attr"`
 	IconStyle struct {
 		Icon struct {
@@ -38,7 +42,9 @@ type Style struct {
 	}
 }
 
+// Structure representing a kml placemark
 type Placemark struct {
+
 	Name      string `xml:"name"`
 	TimeStamp struct {
 		When string `xml:"when"`
@@ -50,7 +56,10 @@ type Placemark struct {
 	StyleUrl string `xml:"styleUrl"`
 }
 
+// Create a new sample writer
 func NewSampleWriterKmz(sampleFile string, useScientific, useLabels bool, minValue, maxValue float64) (SampleWriter, error) {
+
+        // Initialize a sample writer
 	sw := new(SampleWriterKmz)
 	sw.SampleFile = sampleFile
 	sw.KmlFile = sw.SampleFile + ".kml"
@@ -61,7 +70,6 @@ func NewSampleWriterKmz(sampleFile string, useScientific, useLabels bool, minVal
 	sw.UseLabels = useLabels
 
 	var err error
-
 	sw.fd, err = os.Create(sw.KmlFile)
 	if err != nil {
 		return nil, err
@@ -69,24 +77,80 @@ func NewSampleWriterKmz(sampleFile string, useScientific, useLabels bool, minVal
 
 	sw.fw = bufio.NewWriter(sw.fd)
 
-	err = sw.addStylesToKml()
-	if err != nil {
-		return nil, err
+        // Add styles to the kml file
+	var s Style
+	sw.fw.WriteString(xml.Header)
+	sw.fw.WriteString("\n<kml>\n  <Document>\n")
+
+	colors := [...]string{"FFF0FF14", "FF78FFF0", "FF14B4FF", "FF1400FF"}
+
+	for i := 0; i < 4; i++ {
+		s.Id = strconv.Itoa(i)
+		s.IconStyle.Icon.Href = "files/donut.png"
+		s.IconStyle.Scale = "0.5"
+		s.IconStyle.Color = colors[i]
+		s.LabelStyle.Scale = "0.5"
+		b, err := xml.MarshalIndent(s, "    ", "    ")
+		if err != nil {
+                        sw.fd.Close()
+                        os.Remove(sw.KmlFile)
+			return nil, err
+		}
+		sw.fw.WriteString(string(b) + "\n")
 	}
 
 	return sw, nil
 }
 
+// Write a sample to the kml file
 func (sw *SampleWriterKmz) Write(s *Sample) error {
 
-	err := sw.addSampleToKml(s)
+	var p Placemark
+	var styleId int
+
+        // Calculate the style id for this sample
+	sector := (sw.MaxValue - sw.MinValue) / 4.0
+
+	if s.Value <= sw.MinValue+sector {
+		styleId = 0
+	} else if s.Value <= sw.MinValue+sector*2 {
+		styleId = 1
+	} else if s.Value <= sw.MinValue+sector*3 {
+		styleId = 2
+	} else {
+		styleId = 3
+	}
+
+        // Set the number format
+	mod := byte('f')
+	if sw.UseScientific {
+		mod = byte('E')
+	}
+
+        // Initialize a placemark structure
+	if sw.UseLabels {
+		p.Name = strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit
+	}
+	p.StyleUrl = "#" + strconv.Itoa(styleId)
+	p.TimeStamp.When = s.Date
+	p.Point.Coordinates = strconv.FormatFloat(s.Longitude, 'f', -1, 64) + "," +
+		strconv.FormatFloat(s.Latitude, 'f', -1, 64)
+	p.Description = "Value: " + strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit +
+		"\nLatitude: " + strconv.FormatFloat(s.Latitude, 'f', -1, 64) +
+		"\nLongitude: " + strconv.FormatFloat(s.Longitude, 'f', -1, 64) +
+		"\nTime: " + s.Date + "\nFile: " + filepath.Base(sw.SampleFile)
+
+        // Write placemark structure to the kml file
+	b, err := xml.MarshalIndent(p, "    ", "    ")
 	if err != nil {
 		return err
 	}
+	sw.fw.WriteString(string(b) + "\n")
 
 	return nil
 }
 
+// Finish the kml file and zip it to make a kmz file
 func (sw *SampleWriterKmz) Close() error {
 
 	sw.fw.WriteString("  </Document>\n</kml>")
@@ -103,74 +167,7 @@ func (sw *SampleWriterKmz) Close() error {
 	return nil
 }
 
-func (sw *SampleWriterKmz) addStylesToKml() error {
-
-	var s Style
-	sw.fw.WriteString(xml.Header)
-	sw.fw.WriteString("\n<kml>\n  <Document>\n")
-
-	colors := [...]string{"FFF0FF14", "FF78FFF0", "FF14B4FF", "FF1400FF"}
-
-	for i := 0; i < 4; i++ {
-		s.Id = strconv.Itoa(i)
-		s.IconStyle.Icon.Href = "files/donut.png"
-		s.IconStyle.Scale = "0.5"
-		s.IconStyle.Color = colors[i]
-		s.LabelStyle.Scale = "0.5"
-		b, err := xml.MarshalIndent(s, "    ", "    ")
-		if err != nil {
-			return err
-		}
-		sw.fw.WriteString(string(b) + "\n")
-	}
-
-	return nil
-}
-
-func (sw *SampleWriterKmz) addSampleToKml(s *Sample) error {
-
-	var p Placemark
-	var styleId int
-
-	sector := (sw.MaxValue - sw.MinValue) / 4.0
-
-	if s.Value <= sw.MinValue+sector {
-		styleId = 0
-	} else if s.Value <= sw.MinValue+sector*2 {
-		styleId = 1
-	} else if s.Value <= sw.MinValue+sector*3 {
-		styleId = 2
-	} else {
-		styleId = 3
-	}
-
-	mod := byte('f')
-	if sw.UseScientific {
-		mod = byte('E')
-	}
-
-	if sw.UseLabels {
-		p.Name = strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit
-	}
-	p.StyleUrl = "#" + strconv.Itoa(styleId)
-	p.TimeStamp.When = s.Date
-	p.Point.Coordinates = strconv.FormatFloat(s.Longitude, 'f', -1, 64) + "," +
-		strconv.FormatFloat(s.Latitude, 'f', -1, 64)
-	p.Description = "Value: " + strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit +
-		"\nLatitude: " + strconv.FormatFloat(s.Latitude, 'f', -1, 64) +
-		"\nLongitude: " + strconv.FormatFloat(s.Longitude, 'f', -1, 64) +
-		"\nTime: " + s.Date + "\nFile: " + filepath.Base(sw.SampleFile)
-
-	b, err := xml.MarshalIndent(p, "    ", "    ")
-	if err != nil {
-		return err
-	}
-
-	sw.fw.WriteString(string(b) + "\n")
-
-	return nil
-}
-
+// Zip the kml file
 func (sw *SampleWriterKmz) zipKml() error {
 
 	// Create kmz file

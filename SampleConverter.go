@@ -24,16 +24,19 @@ var (
 
 // Settings structure
 type Settings struct {
+
 	PluginDirectory string `json:"PluginDirectory"`
 }
 
 func main() {
 
+        progName := filepath.Base(os.Args[0])
+
 	// Load flags
-	flag.StringVar(&usePlugin, "use-plugin", "", "Generate one or more kmz files using the given plugin")
+	flag.StringVar(&usePlugin, "use-plugin", "", "Convert one or more sample files using the given plugin")
 	flag.BoolVar(&listPlugins, "list-plugins", false, "List all available plugins")
-	flag.StringVar(&setPluginDirectory, "set-plugin-directory", "", "Set the directory where makekmz looks for plugins")
-	flag.BoolVar(&showPluginDirectory, "show-plugin-directory", false, "Show the directory where makekmz looks for plugins")
+        flag.StringVar(&setPluginDirectory, "set-plugin-directory", "", "Set the directory where " + progName + " looks for plugins")
+	flag.BoolVar(&showPluginDirectory, "show-plugin-directory", false, "Show the directory where " + progName + " looks for plugins")
 	flag.BoolVar(&useLabels, "use-labels", false, "Use labels for markers")
 	flag.BoolVar(&useScientific, "use-scientific", false, "Use scientific notation for decimal values")
 	flag.Parse()
@@ -115,13 +118,11 @@ func main() {
 			if err != nil {
 				log.Fatalln(err.Error())
 			}
-			//defer sr.Close()
 
 			sw, err := NewSampleWriterKmz(sampFile, useScientific, useLabels, sr.MinValue, sr.MaxValue)
 			if err != nil {
 				log.Fatalln(err.Error())
 			}
-			//defer sw.Close()
 
 			for {
 				s, ok, err := sr.Read()
