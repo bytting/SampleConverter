@@ -63,7 +63,7 @@ func init() {
 	flag.BoolVar(&showVersion, "version", false, "Show " + progName + " version")
 	flag.BoolVar(&useLabels, "use-labels", false, "Use labels for markers")
 	flag.BoolVar(&useScientific, "use-scientific", false, "Use scientific notation for decimal values")
-	flag.BoolVar(&showHowto, "show-howto", false, "Show the plugin howto")
+	flag.BoolVar(&showHowto, "show-plugin-howto", false, "Show the plugin howto")
 }
 
 func main() {
@@ -71,9 +71,6 @@ func main() {
 	flag.Parse()
 
         useFormat = strings.ToLower(useFormat)
-
-        exePath, _ := filepath.Abs(os.Args[0])
-        exeDir := filepath.Dir(exePath)
 
 	// Initialize log
 	/*logFile := usr.HomeDir + "/makekmz.log"
@@ -86,11 +83,11 @@ func main() {
 
 	// Load settings
 	var settings Settings
-	settingsFile := filepath.Join(exeDir, "settings.json")
+	settingsFile := filepath.Join(ExecutableDir(), "settings.json")
 
 	if !FileExists(settingsFile) {
 
-		settings = Settings{PluginDirectory: filepath.Join(exeDir, "plugins")}
+		settings = Settings{PluginDirectory: filepath.Join(ExecutableDir(), "plugins")}
 		os.MkdirAll(settings.PluginDirectory, 0777)
 		sbytes, _ := json.Marshal(&settings)
 		ioutil.WriteFile(settingsFile, sbytes, 0644)
@@ -107,7 +104,9 @@ func main() {
 		// Print plugin names to stdout
 		files, _ := ioutil.ReadDir(settings.PluginDirectory)
 		for _, f := range files {
+
 			ext := filepath.Ext(f.Name())
+
 			if strings.ToLower(ext) == ".js" {
 				fmt.Printf("%s\n", strings.TrimSuffix(f.Name(), ext))
 			}
@@ -154,13 +153,7 @@ func main() {
 			log.Fatalf("Plugin %s does not exist", pluginFile)
 		}
 
-                var sampleFiles []string
-                for _, pattern := range flag.Args() {
-                        files, _ := filepath.Glob(pattern)
-                        sampleFiles = append(sampleFiles, files...)
-                }
-
-	        for _, sampleFile := range sampleFiles {
+	        for _, sampleFile := range ArgumentFiles() {
 
                         if !FileExists(sampleFile) {
                                 log.Printf("Sampling file %s does not exist", sampleFile)
@@ -184,27 +177,27 @@ func main() {
 // Convert a single sample file
 func convertSampleFile(pluginFile, sampleFile string) error {
 
+	log.Printf("Converting file %s with plugin %s using format \"%s\"\n", sampleFile, pluginFile, useFormat)
+
 	sr, err := NewSampleReader(pluginFile, sampleFile)
 	if err != nil {
                 return err
 	}
 	defer sr.Close()
 
-        sw, err := createSampleWriter(sampleFile, useScientific, useLabels, sr.MinValue, sr.MaxValue)
+        sw, err := createSampleWriter(sampleFile, sr.MinValue, sr.MaxValue)
 	if err != nil {
                 return err
 	}
 	defer sw.Close()
 
-	log.Printf("Converting file %s with plugin %s using format \"%s\"\n", sampleFile, pluginFile, useFormat)
-
 	for {
-		s, ok, err := sr.Read()
+		s, more, err := sr.Read()
 		if err != nil {
                         return err
 		}
 
-		if !ok {
+		if !more {
 			break
 		}
 
@@ -218,7 +211,7 @@ func convertSampleFile(pluginFile, sampleFile string) error {
 }
 
 // Create the correct sample writer based on the useFormat flag
-func createSampleWriter(sampleFile string, useScientific, useLabels bool, minValue, maxValue float64) (SampleWriter, error) {
+func createSampleWriter(sampleFile string, minValue, maxValue float64) (SampleWriter, error) {
 
         switch useFormat {
         case "xml":
