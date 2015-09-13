@@ -41,6 +41,7 @@ var (
         showVersion         bool
 	useLabels           bool
 	useScientific       bool
+        showHowto           bool
 )
 
 // Settings structure
@@ -63,6 +64,7 @@ func init() {
 	flag.BoolVar(&showVersion, "version", false, "Show " + progName + " version")
 	flag.BoolVar(&useLabels, "use-labels", false, "Use labels for markers")
 	flag.BoolVar(&useScientific, "use-scientific", false, "Use scientific notation for decimal values")
+	flag.BoolVar(&showHowto, "show-howto", false, "Show the plugin howto")
 }
 
 func main() {
@@ -118,6 +120,12 @@ func main() {
 
 		// Print version
                 fmt.Println(version)
+                os.Exit(0)
+
+	} else if showHowto {
+
+                // Show plugin howto
+                fmt.Println(TXT_Plugin_Howto)
                 os.Exit(0)
 
 	} else if len(setPluginDirectory) > 0 {
