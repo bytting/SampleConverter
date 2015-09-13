@@ -22,7 +22,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/user"
 	"path/filepath"
 	"strings"
         "errors"
@@ -72,7 +71,9 @@ func main() {
 	flag.Parse()
 
         useFormat = strings.ToLower(useFormat)
-	usr, _ := user.Current()
+
+        exePath, _ := filepath.Abs(os.Args[0])
+        exeDir := filepath.Dir(exePath)
 
 	// Initialize log
 	/*logFile := usr.HomeDir + "/makekmz.log"
@@ -85,14 +86,17 @@ func main() {
 
 	// Load settings
 	var settings Settings
-	settingsFile := filepath.Join(usr.HomeDir, "makekmz.json")
+	settingsFile := filepath.Join(exeDir, "settings.json")
 
 	if !FileExists(settingsFile) {
 
-		settings = Settings{PluginDirectory: filepath.Join(usr.HomeDir, "makekmz-plugins")}
+		settings = Settings{PluginDirectory: filepath.Join(exeDir, "plugins")}
 		os.MkdirAll(settings.PluginDirectory, 0777)
+		sbytes, _ := json.Marshal(&settings)
+		ioutil.WriteFile(settingsFile, sbytes, 0644)
 
 	} else {
+
 		sbytes, _ := ioutil.ReadFile(settingsFile)
 		json.Unmarshal(sbytes, &settings)
 	}
