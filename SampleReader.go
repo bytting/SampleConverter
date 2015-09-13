@@ -25,7 +25,7 @@ import (
 )
 
 // Structure representing a sample reader
-type SampleReader struct {
+type sampleReader struct {
 
 	PluginFile string
 	SampleFile string
@@ -38,10 +38,10 @@ type SampleReader struct {
 }
 
 // Create a new sample reader
-func NewSampleReader(pluginFile, sampleFile string) (*SampleReader, error) {
+func NewSampleReader(pluginFile, sampleFile string) (*sampleReader, error) {
 
         // Initialize a sample reader structure
-	sr := new(SampleReader)
+	sr := new(sampleReader)
 	sr.PluginFile = pluginFile
 	sr.SampleFile = sampleFile
 	sr.MinValue = 0.0
@@ -107,7 +107,7 @@ func NewSampleReader(pluginFile, sampleFile string) (*SampleReader, error) {
 }
 
 // Read the next line from the sample file using a javascript plugin and make a sample structure from it
-func (sr *SampleReader) Read() (*Sample, bool, error) {
+func (sr *sampleReader) Read() (*Sample, bool, error) {
 
 	for {
 		b := sr.scanner.Scan()
@@ -138,14 +138,14 @@ func (sr *SampleReader) Read() (*Sample, bool, error) {
 }
 
 // Close the sample reader and clean up
-func (sr *SampleReader) Close() error {
+func (sr *sampleReader) Close() error {
 
 	sr.fd.Close()
 	return nil
 }
 
 // Create a javascript runtime
-func (sr *SampleReader) createPluginRuntime() (*otto.Otto, error) {
+func (sr *sampleReader) createPluginRuntime() (*otto.Otto, error) {
 
 	// Read plugin file
 	b, err := ioutil.ReadFile(sr.PluginFile)
@@ -164,7 +164,7 @@ func (sr *SampleReader) createPluginRuntime() (*otto.Otto, error) {
 }
 
 // Execute plugin and extract a sample
-func (sr *SampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
+func (sr *sampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 
         // Prepare arguments
 	argLineNum, err := sr.vm.ToValue(lineNum)
@@ -203,7 +203,7 @@ func (sr *SampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 }
 
 // Helper function to populate a sample structure with a single sample
-func (sr *SampleReader) getSample() (*Sample, error) {
+func (sr *sampleReader) getSample() (*Sample, error) {
 
 	var err error
 	var v otto.Value
