@@ -72,15 +72,6 @@ func main() {
 
         useFormat = strings.ToLower(useFormat)
 
-	// Initialize log
-	/*logFile := usr.HomeDir + "/makekmz.log"
-	logfd, err := os.Create(logFile)
-	if err != nil {
-		panic(err)
-	}
-	defer logfd.Close()
-	log.SetOutput(logfd)*/
-
 	// Load settings
 	var settings Settings
 	settingsFile := filepath.Join(ExecutableDir(), "settings.json")
@@ -106,30 +97,25 @@ func main() {
 		for _, f := range files {
 
 			ext := filepath.Ext(f.Name())
-
 			if strings.ToLower(ext) == ".js" {
 				fmt.Printf("%s\n", strings.TrimSuffix(f.Name(), ext))
 			}
 		}
-		os.Exit(0)
 
 	} else if showPluginDirectory {
 
 		// Print current plugin directory to stdout
 		fmt.Println(settings.PluginDirectory)
-		os.Exit(0)
 
 	} else if showVersion {
 
 		// Print version
                 fmt.Println(version)
-                os.Exit(0)
 
 	} else if showHowto {
 
                 // Show plugin howto
                 fmt.Println(TXT_Plugin_Howto)
-                os.Exit(0)
 
 	} else if len(setPluginDirectory) > 0 {
 
@@ -139,24 +125,28 @@ func main() {
 		settings.PluginDirectory = dir
 		sbytes, _ := json.Marshal(&settings)
 		ioutil.WriteFile(settingsFile, sbytes, 0644)
-		os.Exit(0)
 
 	} else if len(usePlugin) > 0 {
 
 		// Convert sample files
 		if flag.NArg() < 1 {
-			log.Fatalln("No input files given")
+                        log.Fatalln("ERROR: No input files given")
 		}
 
 		pluginFile := filepath.Join(settings.PluginDirectory, usePlugin+".js")
 		if !FileExists(pluginFile) {
-			log.Fatalf("Plugin %s does not exist", pluginFile)
+                        log.Fatalf("ERROR: Plugin %s does not exist", pluginFile)
 		}
+
+                sampleFiles := ArgumentFiles()
+                if len(sampleFiles) == 0 {
+                        log.Fatalln("ERROR: No valid input files given")
+                }
 
 	        for _, sampleFile := range ArgumentFiles() {
 
                         if !FileExists(sampleFile) {
-                                log.Printf("Sampling file %s does not exist", sampleFile)
+                                fmt.Errorf("ERROR: Sampling file %s does not exist", sampleFile)
                                 continue
                         }
 
@@ -166,18 +156,15 @@ func main() {
                         }
                 }
 
-		os.Exit(0)
-
 	} else {
-                log.Fatalln("Missing arguments.\nUse \"" + progName + " -h\" for a description of possible arguments")
-		os.Exit(1)
+                log.Fatalf("ERROR: Missing arguments.\nUse \"%s -h\" for a description of possible arguments", progName)
 	}
 }
 
 // Convert a single sample file
 func convertSampleFile(pluginFile, sampleFile string) error {
 
-	log.Printf("Converting file %s with plugin %s using format \"%s\"\n", sampleFile, pluginFile, useFormat)
+	fmt.Printf("Converting file '%s' with plugin '%s' using format '%s'\n", filepath.Base(sampleFile), filepath.Base(pluginFile), useFormat)
 
 	sr, err := NewSampleReader(pluginFile, sampleFile)
 	if err != nil {
