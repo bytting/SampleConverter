@@ -16,9 +16,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package main
 
 import (
-        "os"
-        "flag"
-        "path/filepath"
+	"flag"
+	"os"
+	"os/user"
+	"path/filepath"
 )
 
 // Check if a file exists
@@ -34,22 +35,27 @@ func FileExists(filename string) bool {
 
 func ArgumentFiles() []string {
 
-        var allFiles []string
-        for _, pattern := range flag.Args() {
-                files, _ := filepath.Glob(pattern)
-                allFiles = append(allFiles, files...)
-        }
+	var allFiles []string
+	for _, pattern := range flag.Args() {
+		files, _ := filepath.Glob(pattern)
+		allFiles = append(allFiles, files...)
+	}
 
-        return allFiles
+	return allFiles
 }
 
 func ExecutableFile() string {
 
-        exe, _ := filepath.Abs(os.Args[0])
-        return exe
+	exe, _ := filepath.Abs(os.Args[0])
+	return exe
 }
 
 func ExecutableDir() string {
 
-        return filepath.Dir(ExecutableFile())
+	return filepath.Dir(ExecutableFile())
+}
+
+func HomeDir() string {
+	usr, _ := user.Current()
+	return usr.HomeDir
 }
