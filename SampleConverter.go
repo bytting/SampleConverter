@@ -73,12 +73,11 @@ func main() {
 
 	// Load settings
 	var settings Settings
-	settingsFile := filepath.Join(HomeDir(), progName+"-settings.json")
+	settingsFile := ConfigFile()
 
 	if !FileExists(settingsFile) {
 
-		settings = Settings{PluginDirectory: filepath.Join(HomeDir(), progName+"-plugins")}
-		os.MkdirAll(settings.PluginDirectory, 0777)
+		settings = Settings{PluginDirectory:PluginDir()}
 		sbytes, _ := json.Marshal(&settings)
 		ioutil.WriteFile(settingsFile, sbytes, 0644)
 
