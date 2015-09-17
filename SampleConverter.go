@@ -93,7 +93,6 @@ func main() {
 		// Print plugin names to stdout
 		files, _ := ioutil.ReadDir(settings.PluginDirectory)
 		for _, f := range files {
-
 			ext := filepath.Ext(f.Name())
 			if strings.ToLower(ext) == ".js" {
 				fmt.Printf("%s\n", strings.TrimSuffix(f.Name(), ext))
@@ -141,7 +140,7 @@ func main() {
 			log.Fatalln("ERROR: No valid input files given")
 		}
 
-		for _, sampleFile := range ArgumentFiles() {
+		for _, sampleFile := range sampleFiles {
 
 			if !FileExists(sampleFile) {
 				fmt.Errorf("ERROR: Sampling file %s does not exist", sampleFile)

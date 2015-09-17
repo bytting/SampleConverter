@@ -52,7 +52,6 @@ func NewSampleWriterXml(xmlFile string) (SampleWriter, error) {
 // Write a sample to the xml file
 func (sw *sampleWriterXml) Write(s *Sample) error {
 
-        // Write placemark structure to the kml file
 	b, err := xml.MarshalIndent(s, "  ", "    ")
 	if err != nil {
 		return err
