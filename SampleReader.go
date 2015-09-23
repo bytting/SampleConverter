@@ -21,12 +21,11 @@ import (
 	"github.com/robertkrimen/otto"
 	"io/ioutil"
 	"os"
-        "time"
+	"time"
 )
 
 // Structure representing a sample reader
 type sampleReader struct {
-
 	PluginFile string
 	SampleFile string
 	MinValue   float64
@@ -40,7 +39,7 @@ type sampleReader struct {
 // Create a new sample reader
 func NewSampleReader(pluginFile, sampleFile string) (*sampleReader, error) {
 
-        // Initialize a sample reader structure
+	// Initialize a sample reader structure
 	sr := new(sampleReader)
 	sr.PluginFile = pluginFile
 	sr.SampleFile = sampleFile
@@ -57,14 +56,14 @@ func NewSampleReader(pluginFile, sampleFile string) (*sampleReader, error) {
 	sr.scanner = bufio.NewScanner(sr.fd)
 	sr.lineNum = 0
 
-        // Create a otto javascript runtime
+	// Create a otto javascript runtime
 	sr.vm, err = sr.createPluginRuntime()
 	if err != nil {
 		return nil, err
 	}
 
-        // Scan the sample file to find the min and max measurement values (God, make it stop)
-        // The kmz sample writer need these values to calculate the correct placemark colors
+	// Scan the sample file to find the min and max measurement values (God, make it stop)
+	// The kmz sample writer need these values to calculate the correct placemark colors
 	initialized := false
 
 	for sr.scanner.Scan() {
@@ -98,7 +97,7 @@ func NewSampleReader(pluginFile, sampleFile string) (*sampleReader, error) {
 		return nil, err
 	}
 
-        // Reset the scanner for later use
+	// Reset the scanner for later use
 	sr.fd.Seek(0, 0)
 	sr.scanner = bufio.NewScanner(sr.fd)
 	sr.lineNum = 0
@@ -166,7 +165,7 @@ func (sr *sampleReader) createPluginRuntime() (*otto.Otto, error) {
 // Execute plugin and extract a sample
 func (sr *sampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 
-        // Prepare arguments
+	// Prepare arguments
 	argLineNum, err := sr.vm.ToValue(lineNum)
 	if err != nil {
 		return nil, err
@@ -177,13 +176,13 @@ func (sr *sampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 		return nil, err
 	}
 
-        // Execute plugin
+	// Execute plugin
 	retVal, err := sr.vm.Call("parseLine", nil, argLineNum, argLine)
 	if err != nil {
 		return nil, err
 	}
 
-        // Extract and evaluate return value
+	// Extract and evaluate return value
 	ret, err := retVal.ToBoolean()
 	if err != nil {
 		return nil, err
@@ -193,7 +192,7 @@ func (sr *sampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 		return nil, nil
 	}
 
-        // Extract a full sample from javascript runtime
+	// Extract a full sample from javascript runtime
 	sample, err := sr.getSample()
 	if err != nil {
 		return nil, err
@@ -210,7 +209,7 @@ func (sr *sampleReader) getSample() (*Sample, error) {
 
 	s := new(Sample)
 
-        // Extract date field from javascript runtime
+	// Extract date field from javascript runtime
 	v, err = sr.vm.Get("date")
 	if err != nil {
 		return nil, err
@@ -220,17 +219,17 @@ func (sr *sampleReader) getSample() (*Sample, error) {
 		return nil, errors.New("date not defined")
 	}
 
-        ds, err := v.ToString()
+	ds, err := v.ToString()
 	if err != nil {
 		return nil, err
 	}
 
-        s.Date, err = time.Parse("2006-01-02T15:04:05", ds)
+	s.Date, err = time.Parse("2006-01-02T15:04:05", ds)
 	if err != nil {
 		return nil, err
 	}
 
-        // Extract latitude field from javascript runtime
+	// Extract latitude field from javascript runtime
 	v, err = sr.vm.Get("latitude")
 	if err != nil {
 		return nil, err
@@ -245,7 +244,7 @@ func (sr *sampleReader) getSample() (*Sample, error) {
 		return nil, err
 	}
 
-        // Extract longitude field from javascript runtime
+	// Extract longitude field from javascript runtime
 	v, err = sr.vm.Get("longitude")
 	if err != nil {
 		return nil, err
@@ -260,7 +259,7 @@ func (sr *sampleReader) getSample() (*Sample, error) {
 		return nil, err
 	}
 
-        // Extract value field from javascript runtime
+	// Extract value field from javascript runtime
 	v, err = sr.vm.Get("value")
 	if err != nil {
 		return nil, err
@@ -275,7 +274,7 @@ func (sr *sampleReader) getSample() (*Sample, error) {
 		return nil, err
 	}
 
-        // Extract unit field from javascript runtime
+	// Extract unit field from javascript runtime
 	v, err = sr.vm.Get("unit")
 	if err != nil {
 		return nil, err

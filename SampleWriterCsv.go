@@ -18,14 +18,13 @@ package main
 import (
 	"encoding/csv"
 	"os"
-        "strconv"
+	"strconv"
 )
 
 // Structure representing a sample writer
 type sampleWriterCsv struct {
-
 	CsvFile       string
-        UseScientific bool
+	UseScientific bool
 	fd            *os.File
 	fw            *csv.Writer
 }
@@ -33,10 +32,10 @@ type sampleWriterCsv struct {
 // Create a new sample writer
 func NewSampleWriterCsv(csvFile string, useScientific bool) (SampleWriter, error) {
 
-        // Initialize a sample writer
+	// Initialize a sample writer
 	sw := new(sampleWriterCsv)
 	sw.CsvFile = csvFile
-        sw.UseScientific = useScientific
+	sw.UseScientific = useScientific
 
 	var err error
 	sw.fd, err = os.Create(sw.CsvFile)
@@ -45,7 +44,7 @@ func NewSampleWriterCsv(csvFile string, useScientific bool) (SampleWriter, error
 	}
 
 	sw.fw = csv.NewWriter(sw.fd)
-	sw.fw.Write([]string {"Date", "Latitude", "Longitude", "Value", "Unit"})
+	sw.fw.Write([]string{"Date", "Latitude", "Longitude", "Value", "Unit"})
 
 	return sw, nil
 }
@@ -53,17 +52,17 @@ func NewSampleWriterCsv(csvFile string, useScientific bool) (SampleWriter, error
 // Write a sample to the csv file
 func (sw *sampleWriterCsv) Write(s *Sample) error {
 
-        // Set the number format
+	// Set the number format
 	mod := byte('f')
 	if sw.UseScientific {
 		mod = byte('E')
 	}
 
-        lat := strconv.FormatFloat(s.Latitude, 'f', 8, 64)
-        lon := strconv.FormatFloat(s.Longitude, 'f', 8, 64)
-        val := strconv.FormatFloat(s.Value, mod, 8, 64)
+	lat := strconv.FormatFloat(s.Latitude, 'f', 8, 64)
+	lon := strconv.FormatFloat(s.Longitude, 'f', 8, 64)
+	val := strconv.FormatFloat(s.Value, mod, 8, 64)
 
-	sw.fw.Write([]string {s.Date.String(), lat, lon, val, s.Unit})
+	sw.fw.Write([]string{s.Date.String(), lat, lon, val, s.Unit})
 
 	return nil
 }

@@ -77,7 +77,7 @@ func main() {
 
 	if !FileExists(settingsFile) {
 
-		settings = Settings{PluginDirectory:PluginDir()}
+		settings = Settings{PluginDirectory: PluginDir()}
 		sbytes, _ := json.Marshal(&settings)
 		ioutil.WriteFile(settingsFile, sbytes, 0644)
 

@@ -23,16 +23,15 @@ import (
 
 // Structure representing a sample writer
 type sampleWriterXml struct {
-
-	XmlFile       string
-	fd            *os.File
-	fw            *bufio.Writer
+	XmlFile string
+	fd      *os.File
+	fw      *bufio.Writer
 }
 
 // Create a new sample writer
 func NewSampleWriterXml(xmlFile string) (SampleWriter, error) {
 
-        // Initialize a sample writer
+	// Initialize a sample writer
 	sw := new(sampleWriterXml)
 	sw.XmlFile = xmlFile
 

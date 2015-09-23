@@ -22,15 +22,16 @@ import (
 	"encoding/xml"
 	"io/ioutil"
 	"os"
-        "strings"
 	"path"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
+
+const validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_().,"
 
 // Structure representing a sample writer
 type sampleWriterKmz struct {
-
 	KmlFile       string
 	KmzFile       string
 	MinValue      float64
@@ -43,7 +44,6 @@ type sampleWriterKmz struct {
 
 // Structure representing a kml style
 type Style struct {
-
 	Id        string `xml:"id,attr"`
 	IconStyle struct {
 		Icon struct {
@@ -59,7 +59,6 @@ type Style struct {
 
 // Structure representing a kml placemark
 type Placemark struct {
-
 	Name      string `xml:"name"`
 	TimeStamp struct {
 		When string `xml:"when"`
@@ -74,10 +73,22 @@ type Placemark struct {
 // Create a new sample writer
 func NewSampleWriterKmz(kmzFile string, useScientific, useLabels bool, minValue, maxValue float64) (SampleWriter, error) {
 
-        // Initialize a sample writer
+	// Initialize a sample writer
 	sw := new(sampleWriterKmz)
-	sw.KmzFile = kmzFile
-        ext := filepath.Ext(sw.KmzFile)
+
+	// Replace local characters from basename. Google Earth doesn't like them
+	base := filepath.Base(kmzFile)
+	newBase := ""
+	for _, r := range base {
+		if !strings.ContainsAny(validChars, string(r)) {
+			newBase += "_"
+		} else {
+			newBase += string(r)
+		}
+	}
+	sw.KmzFile = filepath.Join(filepath.Dir(kmzFile), string(os.PathSeparator), newBase)
+
+	ext := filepath.Ext(sw.KmzFile)
 	sw.KmlFile = strings.TrimSuffix(sw.KmzFile, ext) + ".kml"
 	sw.MinValue = minValue
 	sw.MaxValue = maxValue
@@ -92,7 +103,7 @@ func NewSampleWriterKmz(kmzFile string, useScientific, useLabels bool, minValue,
 
 	sw.fw = bufio.NewWriter(sw.fd)
 
-        // Add styles to the kml file
+	// Add styles to the kml file
 	var s Style
 	sw.fw.WriteString(xml.Header)
 	sw.fw.WriteString("\n<kml>\n  <Document>\n")
@@ -107,8 +118,8 @@ func NewSampleWriterKmz(kmzFile string, useScientific, useLabels bool, minValue,
 		s.LabelStyle.Scale = "0.5"
 		b, err := xml.MarshalIndent(s, "    ", "    ")
 		if err != nil {
-                        sw.fd.Close()
-                        os.Remove(sw.KmlFile)
+			sw.fd.Close()
+			os.Remove(sw.KmlFile)
 			return nil, err
 		}
 		sw.fw.WriteString(string(b) + "\n")
@@ -123,7 +134,7 @@ func (sw *sampleWriterKmz) Write(s *Sample) error {
 	var p Placemark
 	var styleId int
 
-        // Calculate the style id for this sample
+	// Calculate the style id for this sample
 	sector := (sw.MaxValue - sw.MinValue) / 4.0
 
 	if s.Value <= sw.MinValue+sector {
@@ -136,18 +147,18 @@ func (sw *sampleWriterKmz) Write(s *Sample) error {
 		styleId = 3
 	}
 
-        // Set the number format
+	// Set the number format
 	mod := byte('f')
 	if sw.UseScientific {
 		mod = byte('E')
 	}
 
-        // Initialize a placemark structure
+	// Initialize a placemark structure
 	if sw.UseLabels {
 		p.Name = strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit
 	}
 	p.StyleUrl = "#" + strconv.Itoa(styleId)
-        p.TimeStamp.When = s.Date.Format("2006-01-02T15:04:05")
+	p.TimeStamp.When = s.Date.Format("2006-01-02T15:04:05")
 	p.Point.Coordinates = strconv.FormatFloat(s.Longitude, 'f', -1, 64) + "," +
 		strconv.FormatFloat(s.Latitude, 'f', -1, 64)
 	p.Description = "Value: " + strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit +
@@ -155,7 +166,7 @@ func (sw *sampleWriterKmz) Write(s *Sample) error {
 		"\nLongitude: " + strconv.FormatFloat(s.Longitude, 'f', -1, 64) +
 		"\nTime: " + s.Date.String() + "\nFile: " + filepath.Base(sw.KmzFile)
 
-        // Write placemark structure to the kml file
+	// Write placemark structure to the kml file
 	b, err := xml.MarshalIndent(p, "    ", "    ")
 	if err != nil {
 		return err

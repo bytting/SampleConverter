@@ -23,20 +23,19 @@ import (
 
 // Structure representing a sample writer
 type sampleWriterJson struct {
-
-	JsonFile      string
-	fd            *os.File
-	fw            *bufio.Writer
-        sep string
+	JsonFile string
+	fd       *os.File
+	fw       *bufio.Writer
+	sep      string
 }
 
 // Create a new sample writer
 func NewSampleWriterJson(jsonFile string) (SampleWriter, error) {
 
-        // Initialize a sample writer
+	// Initialize a sample writer
 	sw := new(sampleWriterJson)
 	sw.JsonFile = jsonFile
-        sw.sep = ""
+	sw.sep = ""
 
 	var err error
 	sw.fd, err = os.Create(sw.JsonFile)
@@ -45,7 +44,7 @@ func NewSampleWriterJson(jsonFile string) (SampleWriter, error) {
 	}
 
 	sw.fw = bufio.NewWriter(sw.fd)
-        sw.fw.WriteString("[\n")
+	sw.fw.WriteString("[\n")
 
 	return sw, nil
 }
@@ -59,9 +58,9 @@ func (sw *sampleWriterJson) Write(s *Sample) error {
 	}
 	sw.fw.WriteString(sw.sep + string(b))
 
-        if len(sw.sep) == 0 {
-                sw.sep = ","
-        }
+	if len(sw.sep) == 0 {
+		sw.sep = ","
+	}
 
 	return nil
 }
@@ -69,7 +68,7 @@ func (sw *sampleWriterJson) Write(s *Sample) error {
 // Finish the json file
 func (sw *sampleWriterJson) Close() error {
 
-        sw.fw.WriteString("\n]")
+	sw.fw.WriteString("\n]")
 	sw.fw.Flush()
 	sw.fd.Close()
 
