@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
+// SampleWriter Common interface for sample readers
 type SampleWriter interface {
 	Write(s *Sample) error
 	Close() error

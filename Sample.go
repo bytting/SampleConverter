@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-// Structure representing a sample
+// Sample Structure representing a sample
 type Sample struct {
 	XMLName   xml.Name  `xml:"sample" json:"-"`
 	Date      time.Time `xml:"date" json:"date"`

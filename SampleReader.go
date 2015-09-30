@@ -24,10 +24,10 @@ import (
 	"time"
 )
 
-// Structure representing a sample reader
-type sampleReader struct {
-	PluginFile string
-	SampleFile string
+// SampleReader Structure representing a sample reader
+type SampleReader struct {
+	pluginFile string
+	sampleFile string
 	MinValue   float64
 	MaxValue   float64
 	fd         *os.File
@@ -36,19 +36,19 @@ type sampleReader struct {
 	vm         *otto.Otto
 }
 
-// Create a new sample reader
-func NewSampleReader(pluginFile, sampleFile string) (*sampleReader, error) {
+// NewSampleReader Create a new sample reader
+func NewSampleReader(pluginFile, sampleFile string) (*SampleReader, error) {
 
 	// Initialize a sample reader structure
-	sr := new(sampleReader)
-	sr.PluginFile = pluginFile
-	sr.SampleFile = sampleFile
+	sr := new(SampleReader)
+	sr.pluginFile = pluginFile
+	sr.sampleFile = sampleFile
 	sr.MinValue = 0.0
 	sr.MaxValue = 0.0
 
 	var err error
 
-	sr.fd, err = os.Open(sr.SampleFile)
+	sr.fd, err = os.Open(sr.sampleFile)
 	if err != nil {
 		return nil, err
 	}
@@ -106,12 +106,12 @@ func NewSampleReader(pluginFile, sampleFile string) (*sampleReader, error) {
 }
 
 // Read the next line from the sample file using a javascript plugin and make a sample structure from it
-func (sr *sampleReader) Read() (*Sample, bool, error) {
+func (sr *SampleReader) Read() (*Sample, bool, error) {
 
 	for {
 		b := sr.scanner.Scan()
 		if !b {
-			return nil, b, nil
+                        break
 		}
 
 		err := sr.scanner.Err()
@@ -137,17 +137,17 @@ func (sr *sampleReader) Read() (*Sample, bool, error) {
 }
 
 // Close the sample reader and clean up
-func (sr *sampleReader) Close() error {
+func (sr *SampleReader) Close() error {
 
 	sr.fd.Close()
 	return nil
 }
 
 // Create a javascript runtime
-func (sr *sampleReader) createPluginRuntime() (*otto.Otto, error) {
+func (sr *SampleReader) createPluginRuntime() (*otto.Otto, error) {
 
 	// Read plugin file
-	b, err := ioutil.ReadFile(sr.PluginFile)
+	b, err := ioutil.ReadFile(sr.pluginFile)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (sr *sampleReader) createPluginRuntime() (*otto.Otto, error) {
 }
 
 // Execute plugin and extract a sample
-func (sr *sampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
+func (sr *SampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 
 	// Prepare arguments
 	argLineNum, err := sr.vm.ToValue(lineNum)
@@ -202,7 +202,7 @@ func (sr *sampleReader) execPlugin(line string, lineNum int) (*Sample, error) {
 }
 
 // Helper function to populate a sample structure with a single sample
-func (sr *sampleReader) getSample() (*Sample, error) {
+func (sr *SampleReader) getSample() (*Sample, error) {
 
 	var err error
 	var v otto.Value

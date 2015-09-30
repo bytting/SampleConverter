@@ -21,24 +21,24 @@ import (
 	"os"
 )
 
-// Structure representing a sample writer
-type sampleWriterJson struct {
-	JsonFile string
+// SampleWriterJSON Structure representing a sample writer
+type SampleWriterJSON struct {
+	jsonFile string
 	fd       *os.File
 	fw       *bufio.Writer
 	sep      string
 }
 
-// Create a new sample writer
-func NewSampleWriterJson(jsonFile string) (SampleWriter, error) {
+// NewSampleWriterJSON Create a new JSON sample writer
+func NewSampleWriterJSON(jsonFile string) (SampleWriter, error) {
 
 	// Initialize a sample writer
-	sw := new(sampleWriterJson)
-	sw.JsonFile = jsonFile
+	sw := new(SampleWriterJSON)
+	sw.jsonFile = jsonFile
 	sw.sep = ""
 
 	var err error
-	sw.fd, err = os.Create(sw.JsonFile)
+	sw.fd, err = os.Create(sw.jsonFile)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +49,8 @@ func NewSampleWriterJson(jsonFile string) (SampleWriter, error) {
 	return sw, nil
 }
 
-// Write a sample to the json file
-func (sw *sampleWriterJson) Write(s *Sample) error {
+// Write Write a sample to the json file
+func (sw *SampleWriterJSON) Write(s *Sample) error {
 
 	b, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
@@ -65,8 +65,8 @@ func (sw *sampleWriterJson) Write(s *Sample) error {
 	return nil
 }
 
-// Finish the json file
-func (sw *sampleWriterJson) Close() error {
+// Close Finish the json file
+func (sw *SampleWriterJSON) Close() error {
 
 	sw.fw.WriteString("\n]")
 	sw.fw.Flush()

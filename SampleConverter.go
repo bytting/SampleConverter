@@ -28,7 +28,7 @@ import (
 )
 
 var progName string
-var version string = "0.5"
+var version = "0.5"
 
 // Flag variables
 var (
@@ -112,7 +112,7 @@ func main() {
 	} else if showHowto {
 
 		// Show plugin howto
-		fmt.Println(TXT_Plugin_Howto)
+		fmt.Println(TxtPluginHowto)
 
 	} else if len(setPluginDirectory) > 0 {
 
@@ -143,7 +143,7 @@ func main() {
 		for _, sampleFile := range sampleFiles {
 
 			if !FileExists(sampleFile) {
-				fmt.Errorf("ERROR: Sampling file %s does not exist", sampleFile)
+				fmt.Fprintf(os.Stderr, "ERROR: Sampling file %s does not exist", sampleFile)
 				continue
 			}
 
@@ -199,11 +199,11 @@ func createSampleWriter(sampleFile string, minValue, maxValue float64) (SampleWr
 
 	switch useFormat {
 	case "xml":
-		return NewSampleWriterXml(sampleFile + ".xml")
+		return NewSampleWriterXML(sampleFile + ".xml")
 	case "kmz":
 		return NewSampleWriterKmz(sampleFile+".kmz", useScientific, useLabels, minValue, maxValue)
 	case "json":
-		return NewSampleWriterJson(sampleFile + ".json")
+		return NewSampleWriterJSON(sampleFile + ".json")
 	case "csv":
 		return NewSampleWriterCsv(sampleFile+".csv", useScientific)
 	}

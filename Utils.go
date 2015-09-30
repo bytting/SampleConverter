@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 )
 
-// Check if a file exists
+// FileExists Check if a file exists
 func FileExists(filename string) bool {
 
 	_, err := os.Stat(filename)
@@ -33,6 +33,7 @@ func FileExists(filename string) bool {
 	return true
 }
 
+// ArgumentFiles Get all files listed on the commandline
 func ArgumentFiles() []string {
 
 	var allFiles []string
@@ -44,17 +45,20 @@ func ArgumentFiles() []string {
 	return allFiles
 }
 
+// ExecutableFile Get the full path of the program executable
 func ExecutableFile() string {
 
 	exe, _ := filepath.Abs(os.Args[0])
 	return exe
 }
 
+// ExecutableDir Get the directory of the program executable
 func ExecutableDir() string {
 
 	return filepath.Dir(ExecutableFile())
 }
 
+// HomeDir Get the HOME directory of the current user
 func HomeDir() string {
 	usr, _ := user.Current()
 	return usr.HomeDir

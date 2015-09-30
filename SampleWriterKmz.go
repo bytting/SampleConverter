@@ -30,8 +30,8 @@ import (
 
 const validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_().,"
 
-// Structure representing a sample writer
-type sampleWriterKmz struct {
+// SampleWriterKmz Structure representing a sample writer
+type SampleWriterKmz struct {
 	KmlFile       string
 	KmzFile       string
 	MinValue      float64
@@ -42,9 +42,9 @@ type sampleWriterKmz struct {
 	fw            *bufio.Writer
 }
 
-// Structure representing a kml style
+// Style Structure representing a kml style
 type Style struct {
-	Id        string `xml:"id,attr"`
+	ID        string `xml:"id,attr"`
 	IconStyle struct {
 		Icon struct {
 			Href string `xml:"href"`
@@ -57,7 +57,7 @@ type Style struct {
 	}
 }
 
-// Structure representing a kml placemark
+// Placemark Structure representing a kml placemark
 type Placemark struct {
 	Name      string `xml:"name"`
 	TimeStamp struct {
@@ -67,14 +67,14 @@ type Placemark struct {
 	Point       struct {
 		Coordinates string `xml:"coordinates"`
 	}
-	StyleUrl string `xml:"styleUrl"`
+	StyleURL string `xml:"styleUrl"`
 }
 
-// Create a new sample writer
+// NewSampleWriterKmz Create a new sample writer
 func NewSampleWriterKmz(kmzFile string, useScientific, useLabels bool, minValue, maxValue float64) (SampleWriter, error) {
 
 	// Initialize a sample writer
-	sw := new(sampleWriterKmz)
+	sw := new(SampleWriterKmz)
 
 	// Replace local characters from basename. Google Earth doesn't like them
 	base := filepath.Base(kmzFile)
@@ -111,7 +111,7 @@ func NewSampleWriterKmz(kmzFile string, useScientific, useLabels bool, minValue,
 	colors := [...]string{"FFF0FF14", "FF78FFF0", "FF14B4FF", "FF1400FF"}
 
 	for i := 0; i < 4; i++ {
-		s.Id = strconv.Itoa(i)
+		s.ID = strconv.Itoa(i)
 		s.IconStyle.Icon.Href = "files/donut.png"
 		s.IconStyle.Scale = "0.5"
 		s.IconStyle.Color = colors[i]
@@ -128,23 +128,23 @@ func NewSampleWriterKmz(kmzFile string, useScientific, useLabels bool, minValue,
 	return sw, nil
 }
 
-// Write a sample to the kml file
-func (sw *sampleWriterKmz) Write(s *Sample) error {
+// Write Write a sample to the kml file
+func (sw *SampleWriterKmz) Write(s *Sample) error {
 
 	var p Placemark
-	var styleId int
+	var styleID int
 
 	// Calculate the style id for this sample
 	sector := (sw.MaxValue - sw.MinValue) / 4.0
 
 	if s.Value <= sw.MinValue+sector {
-		styleId = 0
+		styleID = 0
 	} else if s.Value <= sw.MinValue+sector*2 {
-		styleId = 1
+		styleID = 1
 	} else if s.Value <= sw.MinValue+sector*3 {
-		styleId = 2
+		styleID = 2
 	} else {
-		styleId = 3
+		styleID = 3
 	}
 
 	// Set the number format
@@ -157,7 +157,7 @@ func (sw *sampleWriterKmz) Write(s *Sample) error {
 	if sw.UseLabels {
 		p.Name = strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit
 	}
-	p.StyleUrl = "#" + strconv.Itoa(styleId)
+	p.StyleURL = "#" + strconv.Itoa(styleID)
 	p.TimeStamp.When = s.Date.Format("2006-01-02T15:04:05")
 	p.Point.Coordinates = strconv.FormatFloat(s.Longitude, 'f', -1, 64) + "," +
 		strconv.FormatFloat(s.Latitude, 'f', -1, 64)
@@ -176,8 +176,8 @@ func (sw *sampleWriterKmz) Write(s *Sample) error {
 	return nil
 }
 
-// Finish the kml file and zip it to make a kmz file
-func (sw *sampleWriterKmz) Close() error {
+// Close Finish the kml file and zip it to make a kmz file
+func (sw *SampleWriterKmz) Close() error {
 
 	sw.fw.WriteString("  </Document>\n</kml>")
 	sw.fw.Flush()
@@ -194,7 +194,7 @@ func (sw *sampleWriterKmz) Close() error {
 }
 
 // Zip the kml file
-func (sw *sampleWriterKmz) zipKml() error {
+func (sw *SampleWriterKmz) zipKml() error {
 
 	// Create kmz file
 	zfout, err := os.Create(sw.KmzFile)
@@ -228,7 +228,7 @@ func (sw *sampleWriterKmz) zipKml() error {
 		return err
 	}
 
-	b, err = base64.StdEncoding.DecodeString(PNG_Donut)
+	b, err = base64.StdEncoding.DecodeString(PngDonut)
 	if err != nil {
 		return err
 	}

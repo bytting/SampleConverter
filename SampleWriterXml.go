@@ -21,22 +21,22 @@ import (
 	"os"
 )
 
-// Structure representing a sample writer
-type sampleWriterXml struct {
-	XmlFile string
+// SampleWriterXML Structure representing a sample writer
+type SampleWriterXML struct {
+	xmlFile string
 	fd      *os.File
 	fw      *bufio.Writer
 }
 
-// Create a new sample writer
-func NewSampleWriterXml(xmlFile string) (SampleWriter, error) {
+// NewSampleWriterXML Create a new sample writer
+func NewSampleWriterXML(xmlFile string) (SampleWriter, error) {
 
 	// Initialize a sample writer
-	sw := new(sampleWriterXml)
-	sw.XmlFile = xmlFile
+	sw := new(SampleWriterXML)
+	sw.xmlFile = xmlFile
 
 	var err error
-	sw.fd, err = os.Create(sw.XmlFile)
+	sw.fd, err = os.Create(sw.xmlFile)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +48,8 @@ func NewSampleWriterXml(xmlFile string) (SampleWriter, error) {
 	return sw, nil
 }
 
-// Write a sample to the xml file
-func (sw *sampleWriterXml) Write(s *Sample) error {
+// Write Write a sample to the xml file
+func (sw *SampleWriterXML) Write(s *Sample) error {
 
 	b, err := xml.MarshalIndent(s, "  ", "    ")
 	if err != nil {
@@ -60,8 +60,8 @@ func (sw *sampleWriterXml) Write(s *Sample) error {
 	return nil
 }
 
-// Finish the xml file
-func (sw *sampleWriterXml) Close() error {
+// Close Finish the xml file
+func (sw *SampleWriterXML) Close() error {
 
 	sw.fw.WriteString("</samples>")
 	sw.fw.Flush()

@@ -21,19 +21,19 @@ import (
 	"strconv"
 )
 
-// Structure representing a sample writer
-type sampleWriterCsv struct {
+// SampleWriterCsv Structure representing a sample writer
+type SampleWriterCsv struct {
 	CsvFile       string
 	UseScientific bool
 	fd            *os.File
 	fw            *csv.Writer
 }
 
-// Create a new sample writer
+// NewSampleWriterCsv Create a new CSV sample writer
 func NewSampleWriterCsv(csvFile string, useScientific bool) (SampleWriter, error) {
 
 	// Initialize a sample writer
-	sw := new(sampleWriterCsv)
+	sw := new(SampleWriterCsv)
 	sw.CsvFile = csvFile
 	sw.UseScientific = useScientific
 
@@ -49,8 +49,8 @@ func NewSampleWriterCsv(csvFile string, useScientific bool) (SampleWriter, error
 	return sw, nil
 }
 
-// Write a sample to the csv file
-func (sw *sampleWriterCsv) Write(s *Sample) error {
+// Write Write a sample to the csv file
+func (sw *SampleWriterCsv) Write(s *Sample) error {
 
 	// Set the number format
 	mod := byte('f')
@@ -67,8 +67,8 @@ func (sw *sampleWriterCsv) Write(s *Sample) error {
 	return nil
 }
 
-// Finish the csv file
-func (sw *sampleWriterCsv) Close() error {
+// Close Finish the CSV file
+func (sw *SampleWriterCsv) Close() error {
 
 	sw.fw.Flush()
 	sw.fd.Close()

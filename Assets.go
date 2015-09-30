@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package main
 
 // Howto for plugins
-const TXT_Plugin_Howto = `
+const TxtPluginHowto = `
 Plugins are standalone javascript files that are designed to parse a single line 
 from a sampling log file. In order to be used as a plugin, it must implement a function
 called "parseLine" with the following signature:
@@ -43,7 +43,7 @@ These variables should be set to their respective values in the body of the pars
 `
 
 // Base64 encoded PNG image
-const PNG_Donut = `
+const PngDonut = `
 iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAAK/INwWK6QAACSZJREFU
 eNrtWw1MVWUYdogI+IOJXBFTQzHFYUZkjoUpivmbJaU1CZdBooZhRqZWGlMx0yTRRsvmbK5Np810
 2nJUXAg1tBQFxUADJDEwMYVEEri9Dz7H3RH33AP3XNC6Z3smd17Od87zvd/7Pu/zfbQzmUzt/s9o

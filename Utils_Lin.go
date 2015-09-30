@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 )
 
+// ConfigFile Get the config directory for Linux systems
 func ConfigFile() string {
 
 	p := filepath.Join(HomeDir(), ".config", "sampleconverter")
@@ -14,6 +15,7 @@ func ConfigFile() string {
 	return filepath.Join(p, "settings.json")
 }
 
+// PluginDir Get the default plugin directory
 func PluginDir() string {
 
 	p := filepath.Join(HomeDir(), "sampleconverter", "plugins")
