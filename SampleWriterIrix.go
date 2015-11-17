@@ -20,6 +20,7 @@ import (
 	"bufio"
 	"encoding/base64"
 	"encoding/xml"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path"
@@ -99,6 +100,9 @@ func NewSampleWriterIrix(kmzFile string, useScientific, useLabels bool) (SampleW
 // Write Write a sample to the kml file
 func (sw *SampleWriterIrix) Write(s *Sample) error {
 
+	if strings.ToLower(s.Unit) != "sv/h" {
+		return errors.New("Irix format requires unit to be \"Sv/h\"")
+	}
 	var p Placemark
 	var styleID int
 
