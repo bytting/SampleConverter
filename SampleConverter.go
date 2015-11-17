@@ -28,7 +28,7 @@ import (
 )
 
 var progName string
-var version = "0.5"
+var version = "0.7"
 
 // Flag variables
 var (
