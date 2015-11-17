@@ -76,7 +76,7 @@ func NewSampleWriterIrix(kmzFile string, useScientific, useLabels bool) (SampleW
 	sw.fw.WriteString(xml.Header)
 	sw.fw.WriteString("\n<kml>\n  <Document>\n")
 
-	colors := [...]string{"50F0AA14", "5078FFB4", "5078FFF0", "5014B4FF", "50143CFF"}
+	colors := [...]string{"FFF0AA14", "FF78FFB4", "FF78FFF0", "FF14B4FF", "FF143CFF"}
 
 	for i := 0; i < 5; i++ {
 		s.ID = strconv.Itoa(i)
