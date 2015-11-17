@@ -35,6 +35,7 @@ var (
 	usePlugin           string
 	useFormat           string
 	listPlugins         bool
+	listFormats         bool
 	setPluginDirectory  string
 	showPluginDirectory bool
 	showVersion         bool
@@ -57,6 +58,7 @@ func init() {
 	flag.StringVar(&usePlugin, "use-plugin", "", "Convert one or more sample files using the given plugin")
 	flag.StringVar(&useFormat, "use-format", "kmz", "Use the given output format")
 	flag.BoolVar(&listPlugins, "list-plugins", false, "List all available plugins")
+	flag.BoolVar(&listFormats, "list-formats", false, "List all available formats")
 	flag.StringVar(&setPluginDirectory, "set-plugin-directory", "", "Set the directory where "+progName+" looks for plugins")
 	flag.BoolVar(&showPluginDirectory, "show-plugin-directory", false, "Show the directory where "+progName+" looks for plugins")
 	flag.BoolVar(&showVersion, "version", false, "Show "+progName+" version")
@@ -98,6 +100,10 @@ func main() {
 				fmt.Printf("%s\n", strings.TrimSuffix(f.Name(), ext))
 			}
 		}
+
+	} else if listFormats {
+
+		fmt.Println("csv\njson\nxml\nkmz\nirix-kmz")
 
 	} else if showPluginDirectory {
 
@@ -202,6 +208,8 @@ func createSampleWriter(sampleFile string, minValue, maxValue float64) (SampleWr
 		return NewSampleWriterXML(sampleFile + ".xml")
 	case "kmz":
 		return NewSampleWriterKmz(sampleFile+".kmz", useScientific, useLabels, minValue, maxValue)
+	case "irix-kmz":
+		return NewSampleWriterIrix(sampleFile+".irix.kmz", useScientific, useLabels)
 	case "json":
 		return NewSampleWriterJSON(sampleFile + ".json")
 	case "csv":
