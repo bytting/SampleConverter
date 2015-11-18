@@ -20,7 +20,6 @@ import (
 	"bufio"
 	"encoding/base64"
 	"encoding/xml"
-	"errors"
 	"io/ioutil"
 	"os"
 	"path"
@@ -82,9 +81,9 @@ func NewSampleWriterIrix(kmzFile string, useScientific, useLabels bool) (SampleW
 	for i := 0; i < 5; i++ {
 		s.ID = strconv.Itoa(i)
 		s.IconStyle.Icon.Href = "files/donut.png"
-		s.IconStyle.Scale = "0.5"
+		s.IconStyle.Scale = "1.0"
 		s.IconStyle.Color = colors[i]
-		s.LabelStyle.Scale = "0.5"
+		s.LabelStyle.Scale = "1.0"
 		b, err := xml.MarshalIndent(s, "    ", "    ")
 		if err != nil {
 			sw.fd.Close()
@@ -100,9 +99,6 @@ func NewSampleWriterIrix(kmzFile string, useScientific, useLabels bool) (SampleW
 // Write Write a sample to the kml file
 func (sw *SampleWriterIrix) Write(s *Sample) error {
 
-	if strings.ToLower(s.Unit) != "sv/h" {
-		return errors.New("Irix format requires unit to be \"Sv/h\"")
-	}
 	var p Placemark
 	var styleID int
 
