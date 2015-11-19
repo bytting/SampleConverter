@@ -44,7 +44,7 @@ func NewSampleWriterCsv(csvFile string, useScientific bool) (SampleWriter, error
 	}
 
 	sw.fw = csv.NewWriter(sw.fd)
-	sw.fw.Write([]string{"Date", "Latitude", "Longitude", "Value", "Unit"})
+	sw.fw.Write([]string{"Date", "Latitude", "Longitude", "Altitude", "Value", "Unit"})
 
 	return sw, nil
 }
@@ -60,9 +60,10 @@ func (sw *SampleWriterCsv) Write(s *Sample) error {
 
 	lat := strconv.FormatFloat(s.Latitude, 'f', 8, 64)
 	lon := strconv.FormatFloat(s.Longitude, 'f', 8, 64)
+	alt := strconv.FormatFloat(s.Altitude, 'f', 8, 64)
 	val := strconv.FormatFloat(s.Value, mod, 8, 64)
 
-	sw.fw.Write([]string{s.Date.String(), lat, lon, val, s.Unit})
+	sw.fw.Write([]string{s.Date.String(), lat, lon, alt, val, s.Unit})
 
 	return nil
 }

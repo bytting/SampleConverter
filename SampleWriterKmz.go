@@ -164,6 +164,7 @@ func (sw *SampleWriterKmz) Write(s *Sample) error {
 	p.Description = "Value: " + strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit +
 		"\nLatitude: " + strconv.FormatFloat(s.Latitude, 'f', -1, 64) +
 		"\nLongitude: " + strconv.FormatFloat(s.Longitude, 'f', -1, 64) +
+		"\nAltitude: " + strconv.FormatFloat(s.Altitude, 'f', -1, 64) +
 		"\nTime: " + s.Date.String() + "\nFile: " + filepath.Base(sw.KmzFile)
 
 	// Write placemark structure to the kml file

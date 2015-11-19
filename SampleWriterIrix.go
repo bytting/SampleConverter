@@ -123,7 +123,7 @@ func (sw *SampleWriterIrix) Write(s *Sample) error {
 
 	// Initialize a placemark structure
 	if sw.UseLabels {
-		p.Name = strconv.FormatFloat(s.Value, mod, -1, 64) + " " + s.Unit
+		p.Name = strconv.FormatFloat(s.Value, mod, -1, 64) + " Sv/h"
 	}
 	p.StyleURL = "#" + strconv.Itoa(styleID)
 	p.TimeStamp.When = s.Date.Format("2006-01-02T15:04:05")
@@ -132,6 +132,7 @@ func (sw *SampleWriterIrix) Write(s *Sample) error {
 	p.Description = "Value: " + strconv.FormatFloat(s.Value, mod, -1, 64) + " Sv/h" +
 		"\nLatitude: " + strconv.FormatFloat(s.Latitude, 'f', -1, 64) +
 		"\nLongitude: " + strconv.FormatFloat(s.Longitude, 'f', -1, 64) +
+		"\nAltitude: " + strconv.FormatFloat(s.Altitude, 'f', -1, 64) +
 		"\nTime: " + s.Date.String() + "\nFile: " + filepath.Base(sw.KmzFile)
 
 	// Write placemark structure to the kml file

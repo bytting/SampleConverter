@@ -111,7 +111,7 @@ func (sr *SampleReader) Read() (*Sample, bool, error) {
 	for {
 		b := sr.scanner.Scan()
 		if !b {
-                        break
+			break
 		}
 
 		err := sr.scanner.Err()
@@ -255,6 +255,21 @@ func (sr *SampleReader) getSample() (*Sample, error) {
 	}
 
 	s.Longitude, err = v.ToFloat()
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract altitude field from javascript runtime
+	v, err = sr.vm.Get("altitude")
+	if err != nil {
+		return nil, err
+	}
+
+	if !v.IsDefined() {
+		return nil, errors.New("altitude not defined")
+	}
+
+	s.Altitude, err = v.ToFloat()
 	if err != nil {
 		return nil, err
 	}

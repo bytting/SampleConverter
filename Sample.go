@@ -26,6 +26,7 @@ type Sample struct {
 	Date      time.Time `xml:"date" json:"date"`
 	Latitude  float64   `xml:"latitude" json:"latitude"`
 	Longitude float64   `xml:"longitude" json:"longitude"`
+	Altitude  float64   `xml:"altitude" json:"altitude"`
 	Value     float64   `xml:"value" json:"value"`
 	Unit      string    `xml:"unit" json:"unit"`
 }
