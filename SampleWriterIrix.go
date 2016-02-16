@@ -10,8 +10,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-// CONTRIBUTORS AND COPYRIGHT HOLDERS (c) 2015:
-// Dag Robole (dag D0T robole AT gmail D0T com)
+// Copyright: (c) 2015 Norwegian Radiation Protection Authority
+// Contributors: Dag Robøle (dag D0T robole AT gmail D0T com)
 
 package main
 
