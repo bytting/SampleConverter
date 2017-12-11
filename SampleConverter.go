@@ -103,7 +103,7 @@ func main() {
 
 	} else if listFormats {
 
-		fmt.Println("csv\njson\nxml\nkmz\nirix-kmz")
+		fmt.Println("csv\njson\nxml\nkmz\nkmz-iaea")
 
 	} else if showPluginDirectory {
 
